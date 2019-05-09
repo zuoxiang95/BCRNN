@@ -3,7 +3,7 @@
 
 """
 @author: ZuoXiang
-@contact: zuoxiang@jd.com
+@contact: zx_data@126.com
 @file: build_tf_records.py
 @time: 2019/4/18 17:31
 @desc:

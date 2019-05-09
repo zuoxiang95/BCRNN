@@ -3,7 +3,7 @@
 
 """
 @author: ZuoXiang
-@contact: zuoxiang@jd.com
+@contact: zx_data@126.com
 @file: hparams.py
 @time: 2019/4/16 17:54
 @desc:

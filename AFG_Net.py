@@ -3,7 +3,7 @@
 
 """
 @author: ZuoXiang
-@contact: zuoxiang@jd.com
+@contact: zx_data@126.com
 @file: AFG_Net.py
 @time: 2019/4/8 19:55
 @desc:

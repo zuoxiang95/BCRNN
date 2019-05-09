@@ -3,7 +3,7 @@
 
 """
 @author: ZuoXiang
-@contact: zuoxiang@jd.com
+@contact: zx_data@126.com
 @file: loss.py
 @time: 2019/4/18 14:33
 @desc:
