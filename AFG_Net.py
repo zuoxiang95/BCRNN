@@ -381,14 +381,17 @@ class AFGNet(object):
                                 weights_regularizer=slim.l2_regularizer(weight_decay),
                                 padding='SAME'):
                 # 8 landmarks and 1 background
-                heat_maps = slim.conv2d(net, 9, [1, 1], scope='ConstructHeatMaps')
+                #  heat_maps = slim.conv2d(net, 9, [1, 1], scope='ConstructHeatMaps')
+                # Only provide 8 landmarks
+                heat_maps = slim.conv2d(net, 8, [1, 1], scope='ConstructHeatMaps')
                 heat_maps = tf.sigmoid(heat_maps, name='sigmoid')
 
             # if stage.lower() == 'landmark':
             #     return heat_maps
 
             # heat-maps l-collar l-sleeve l-waistline l-hem r-...
-            heat_maps = tf.transpose(heat_maps, (3, 0, 1, 2))
+            # Should heat_maps be transpose?
+            # heat_maps = tf.transpose(heat_maps, (3, 0, 1, 2))
             # grammar:
             # RK:
             #         l.collar <-> l.waistline <-> l.hem;
@@ -410,7 +413,7 @@ class AFGNet(object):
             RS3_refined_heatmaps = self.BCRNNBlock(heat_maps, 2, [2, 6], 'RS_3')
             RS4_refined_heatmaps = self.BCRNNBlock(heat_maps, 2, [3, 7], 'RS_4')
 
-            background = heat_maps[8]
+            # background = heat_maps[8]
 
             # max merge heatmaps
             l_collar = tf.reduce_max([RK1_refined_heatmaps[0], RK2_refined_heatmaps[0], RS1_refined_heatmaps[0]],
@@ -426,17 +429,21 @@ class AFGNet(object):
             r_hem = tf.reduce_max([RK3_refined_heatmaps[2], RS4_refined_heatmaps[1]], axis=0)
 
             refined_heatmaps = tf.stack([l_collar, l_sleeve, l_waistline, l_hem,
-                                         r_collar, r_sleeve, r_waistline, r_hem,
-                                         background], axis=3)
+                                         r_collar, r_sleeve, r_waistline, r_hem,], axis=3)
 
             # landmarks predictions
-            output = tf.nn.softmax(refined_heatmaps, name='RefinedHeatMaps')
+            # output = tf.nn.softmax(refined_heatmaps, name='RefinedHeatMaps')
+            # Not softmax! I think it should be sigmoid to provide the probability!
+            # Each pixl should be a probability to express if it is keypoint!
+            output = tf.sigmoid(refined_heatmaps, name='RefinedHeatMaps')
 
         if stage.lower() == 'landmark':
             return output, None
 
         with tf.variable_scope('LandmarkAttention'):
             output = output[:, :, :, :-1]
+            # TODO: This is not be reduce_mean
+            # Should be max pooling, get the maxium value from each chanel!
             AL = tf.reduce_mean(output, axis=-1, keep_dims=True)
             # tile_shape = tf.ones_like(output.shape)
             # tile_shape[-1] = output.shape[-1]
